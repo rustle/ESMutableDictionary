@@ -17,6 +17,7 @@
 //  limitations under the License.
 //  
 #import "ESMutableDictionary.h"
+#import "ARCLogic.h"
 
 #if !__has_feature(objc_arc)
 #error This class will leak without ARC
@@ -45,7 +46,7 @@
 - (void)dealloc
 {
 	CFRelease(_internalDictionary);
-	dispatch_release(_syncQueue);
+	es_dispatch_release(_syncQueue);
 }
 
 - (void)setObject:(id)obj forKey:(id)key

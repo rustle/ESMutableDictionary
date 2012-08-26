@@ -1,0 +1,3 @@
+[submodule "ARCLogic"]
+	path = ARCLogic
+	url = https://github.com/rustle/ARCLogic.git
