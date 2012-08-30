@@ -18,6 +18,7 @@
 //  
 
 #import <Foundation/Foundation.h>
+#import "ARCLogic.h"
 
 /**
  * Drastically simplified, but thread safe mutable dictionary.
@@ -31,7 +32,15 @@
 - (void)setObject:(id)obj forKey:(id<NSCopying>)key;
 - (void)removeObjectForKey:(id<NSCopying>)key;
 - (id)objectForKey:(id<NSCopying>)key;
+
+#if HASWEAK
+- (void)setWeakObject:(id)obj forKey:(id<NSCopying>)key;
+- (void)removeWeakObjectForKey:(id<NSCopying>)key;
+- (__weak id)weakObjectForKey:(id<NSCopying>)key;
+#endif
+
 - (NSUInteger)count;
+// Returns only non weak objects
 - (NSDictionary *)copyDictionary;
 
 @end
