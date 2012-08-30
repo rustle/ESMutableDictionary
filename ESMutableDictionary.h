@@ -28,10 +28,9 @@
 
 @interface ESMutableDictionary : NSObject
 
-- (id)init;
-- (void)setObject:(id)obj forKey:(id)key;
-- (void)removeObjectForKey:(id)key;
-- (id)objectForKey:(id)key;
+- (void)setObject:(id)obj forKey:(id<NSCopying>)key;
+- (void)removeObjectForKey:(id<NSCopying>)key;
+- (id)objectForKey:(id<NSCopying>)key;
 - (NSUInteger)count;
 - (NSDictionary *)copyDictionary;
 

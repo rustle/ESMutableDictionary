@@ -25,72 +25,60 @@
 
 @implementation ESMutableDictionary
 {
-	CFMutableDictionaryRef _internalDictionary;
+	NSMutableDictionary *_internalDictionary;
 	dispatch_queue_t _syncQueue;
 }
 
-- (id)init
+- (instancetype)init
 {
 	self = [super init];
 	if (self)
 	{
-		_internalDictionary = CFDictionaryCreateMutable(kCFAllocatorDefault, 
-														0, 
-														&kCFTypeDictionaryKeyCallBacks, 
-														&kCFTypeDictionaryValueCallBacks);
-		_syncQueue = dispatch_queue_create("com.es.mutabledictionary", 0);
+		_internalDictionary = [NSMutableDictionary new];
+		_syncQueue = dispatch_queue_create("com.es.mutabledictionary", DISPATCH_QUEUE_CONCURRENT);
 	}
 	return self;
 }
 
 - (void)dealloc
 {
-	CFRelease(_internalDictionary);
 	es_dispatch_release(_syncQueue);
 }
 
-- (void)setObject:(id)obj forKey:(id)key
+- (void)setObject:(id)obj forKey:(id<NSCopying>)key
 {
 	if (!obj || !key)
 		return;
-	dispatch_sync(_syncQueue,  ^(void) {
-		CFDictionarySetValue(_internalDictionary, (__bridge CFTypeRef)key, (__bridge CFTypeRef)obj);
+	dispatch_barrier_sync(_syncQueue, ^{
+		[_internalDictionary setObject:obj forKey:key];
 	});
 }
 
-- (void)removeObjectForKey:(id)key
+- (void)removeObjectForKey:(id<NSCopying>)key
 {
 	if (!key)
 		return;
-	dispatch_sync(_syncQueue,  ^(void) {
-		CFDictionaryRemoveValue(_internalDictionary, (__bridge CFTypeRef)key);
+	dispatch_barrier_sync(_syncQueue, ^{
+		[_internalDictionary removeObjectForKey:key];
 	});
 }
 
-- (id)objectForKey:(id)key
+- (id)objectForKey:(id<NSCopying>)key
 {
 	if (!key)
 		return nil;
-	__block CFTypeRef value = nil;
-	__block Boolean present;
+	__block id value = nil;
 	dispatch_sync(_syncQueue, ^(void) {
-		present = CFDictionaryGetValueIfPresent(_internalDictionary, (__bridge CFTypeRef)key, &value);
-		if (present && value != NULL)
-			CFRetain(value);
+		value = [_internalDictionary objectForKey:key];
 	});
-	if (present)
-	{
-		return objc_retainedObject(value);
-	}
-	else
-		return nil;
+	return value;
 }
 
 - (NSDictionary *)copyDictionary
 {
 	__block NSDictionary *dictionary;
 	dispatch_sync(_syncQueue, ^(void) {
-		dictionary = [(__bridge NSDictionary *)_internalDictionary copy];
+		dictionary = [_internalDictionary copy];
 	});
 	return dictionary;
 }
@@ -99,7 +87,7 @@
 {
 	__block NSUInteger count;
 	dispatch_sync(_syncQueue, ^(void) {
-		count = CFDictionaryGetCount(_internalDictionary);
+		count = [_internalDictionary count];
 	});
 	return count;
 }
