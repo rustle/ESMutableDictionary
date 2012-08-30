@@ -19,10 +19,6 @@
 #import "ESMutableDictionary.h"
 #import "ARCLogic.h"
 
-#if !__has_feature(objc_arc)
-#error This class will leak without ARC
-#endif
-
 @implementation ESMutableDictionary
 {
 	NSMutableDictionary *_internalDictionary;
@@ -42,6 +38,7 @@
 
 - (void)dealloc
 {
+	NO_ARC([_internalDictionary release];)
 	es_dispatch_release(_syncQueue);
 }
 
