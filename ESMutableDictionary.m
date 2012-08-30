@@ -52,9 +52,6 @@
 {
 	NO_ARC([_internalDictionary release];)
 	es_dispatch_release(_syncQueue);
-#if HASWEAK
-	NO_ARC([_weakInternalDictionary release];)
-#endif
 }
 
 - (void)setObject:(id)obj forKey:(id<NSCopying>)key
