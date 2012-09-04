@@ -134,6 +134,18 @@
 	return value;
 }
 
+- (void)vacuum
+{
+	dispatch_barrier_sync(_syncQueue, ^{
+		NSMutableArray *keysToRemove = [NSMutableArray array];
+		[_weakInternalDictionary enumerateKeysAndObjectsUsingBlock:^(id<NSCopying> key, ESMutableDictionaryWeakContainer *container, BOOL *stop) {
+			if (container.object == nil)
+				[keysToRemove addObject:key];
+		}];
+		[_weakInternalDictionary removeObjectsForKeys:keysToRemove];
+	});
+}
+
 #endif
 
 @end

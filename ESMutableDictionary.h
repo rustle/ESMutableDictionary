@@ -37,6 +37,8 @@
 - (void)setWeakObject:(id)obj forKey:(id<NSCopying>)key;
 - (void)removeWeakObjectForKey:(id<NSCopying>)key;
 - (__weak id)weakObjectForKey:(id<NSCopying>)key;
+// Clear out any zeroed objects
+- (void)vacuum;
 #endif
 
 - (NSUInteger)count;
